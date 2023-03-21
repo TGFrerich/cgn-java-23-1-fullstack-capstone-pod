@@ -1,8 +1,8 @@
 package com.github.tgfrerich.backend.controller;
 
 import com.github.tgfrerich.backend.service.PodService;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,8 +15,8 @@ public class PodController {
         this.podService = podService;
     }
 
-    @PostMapping("/{id}")
-    public String sendUrl(@PathVariable String url) {
+    @PostMapping("/podcasts")
+    public String sendUrl(@RequestBody String url) {
         return podService.sendUrl(url);
     }
 }
