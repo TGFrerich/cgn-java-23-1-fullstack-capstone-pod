@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class PodServiceTest {
 
@@ -24,8 +25,8 @@ class PodServiceTest {
         podRepository = mock(PodRepository.class);
         idService = mock(IdService.class);
         podService = new PodService(podRepository, idService);
-        podcast1 = new Podcast("12", "assemblyai", 345, "url.hendrik", "en_us", 0.97, true, "assembly", true, "completed", "This is the podcast that you are listening to");
-
+        when(idService.generateId()).thenReturn("Some Id");
+        podcast1 = new Podcast(idService.generateId(), "12", "assemblyai", 345, "url.hendrik", "en_us", 0.97, true, "assembly", true, "completed", "This is the podcast that you are listening to");
     }
 
     @Test
