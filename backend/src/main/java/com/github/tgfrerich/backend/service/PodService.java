@@ -18,8 +18,7 @@ public class PodService {
         if (url.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NO_CONTENT, "URL Required");
         } else {
-            String inTheFutureUrlWillBeCheckedIfAlreadyInDatabase = url;
-            return inTheFutureUrlWillBeCheckedIfAlreadyInDatabase;
+            return url;
         }
 
     }
