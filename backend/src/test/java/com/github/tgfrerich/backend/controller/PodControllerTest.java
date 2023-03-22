@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+
 @SpringBootTest
 @AutoConfigureMockMvc
 class PodControllerTest {
@@ -23,7 +24,7 @@ class PodControllerTest {
 
     @Test
     @DirtiesContext
-    void WhenSuccessfulPostUrlGetUrlBack() throws Exception {
+    void postUrl_shouldReturnSameUrl() throws Exception {
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/podcasts")
                         .contentType("text/plain;charset=UTF-8")
@@ -34,7 +35,5 @@ class PodControllerTest {
         String actualResponse = result.getResponse().getContentAsString();
 
         Assertions.assertEquals(testUrl, actualResponse);
-
-
     }
 }
