@@ -10,14 +10,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Podcast {
 
     private String id;
-    private String acoustic_model;
-    private double audio_duration;
-    private String audio_url;
-    private String language_code;
+    private String acousticModel;
+    private double audioDuration;
+    private String audioUrl;
+    private String languageCode;
     private double confidence;
-    private Boolean format_text;
+    private Boolean formatText;
 
-    private String language_model;
+    private String languageModel;
     private Boolean punctuate;
     private String status;
     private String text;
