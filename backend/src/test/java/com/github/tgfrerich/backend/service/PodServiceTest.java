@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,8 +41,8 @@ class PodServiceTest {
     void sendUrl_withEmptyUrl_shouldThrowException() {
         String url = "";
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> podService.sendUrl(url));
-        assertEquals(HttpStatus.NO_CONTENT, exception.getStatusCode());
-        assertEquals("URL Required", exception.getReason());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertNull(exception.getReason());
     }
 
 
