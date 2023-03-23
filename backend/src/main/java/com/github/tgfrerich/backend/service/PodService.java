@@ -9,8 +9,8 @@ public class PodService {
 
 
     public String sendUrl(String url) {
-        if (url.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "URL Required");
+        if (url == null || url.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         } else {
             return url;
         }

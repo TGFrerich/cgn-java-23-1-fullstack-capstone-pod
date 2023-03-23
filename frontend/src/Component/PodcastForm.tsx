@@ -6,12 +6,13 @@ function PodcastForm() {
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        try {
-            await axios.post('/api/podcasts', {podcast});
-            setPodcast('');
-        } catch (error) {
-            console.error(error);
-        }
+        await axios.post('/api/podcasts', podcast).then(() => {
+        }).catch((error) => {
+            console.log(error.response.data.error)
+        })
+        ;
+        setPodcast('');
+
     };
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {

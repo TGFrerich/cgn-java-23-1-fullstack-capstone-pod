@@ -16,7 +16,7 @@ public class PodController {
     }
 
     @PostMapping("/podcasts")
-    public String sendUrl(@RequestBody String url) {
+    public String sendUrl(@RequestBody(required = false) String url) {
         return podService.sendUrl(url);
     }
 }
