@@ -1,5 +1,6 @@
 package com.github.tgfrerich.backend.controller;
 
+import com.github.tgfrerich.backend.service.AssemblyAIApiService;
 import com.github.tgfrerich.backend.service.PodService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,13 +11,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class PodController {
     private final PodService podService;
+    private final AssemblyAIApiService assemblyAIApiService;
 
-    public PodController(PodService podService) {
+    public PodController(PodService podService, AssemblyAIApiService assemblyAIApiService) {
         this.podService = podService;
+        this.assemblyAIApiService = assemblyAIApiService;
     }
 
     @PostMapping("/podcasts")
     public String sendUrl(@RequestBody(required = false) String url) {
-        return podService.sendUrl(url);
+        podService.sendUrl(url);
+        return assemblyAIApiService.transcribeAudio(url);
+
     }
 }
