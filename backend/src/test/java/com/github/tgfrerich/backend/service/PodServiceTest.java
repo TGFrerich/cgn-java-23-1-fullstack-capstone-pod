@@ -1,6 +1,7 @@
 package com.github.tgfrerich.backend.service;
 
 import com.github.tgfrerich.backend.model.Podcast;
+import com.github.tgfrerich.backend.model.RequestBodyForAssemblyAI;
 import com.github.tgfrerich.backend.repository.PodRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,12 +30,11 @@ class PodServiceTest {
     }
 
     @Test
-    void sendUrl_withValidUrl_shouldReturnSameUrl() {
-        String url = "test.url";
-        String result = podService.sendUrl(url);
+    void sendUrl_withValidUrl_shouldReturn_RequestBodyForAssemblyAI_withValidUrl() {
+        String url = "http://test.url";
+        RequestBodyForAssemblyAI result = podService.sendUrl(url);
 
-        // Assert
-        assertEquals(url, result);
+        assertEquals(url, result.getAudio_url());
     }
 
     @Test
@@ -46,4 +46,15 @@ class PodServiceTest {
     }
 
 
+    @Test
+    void isValidURL_WithHttpUrl_shouldReturnTrue() {
+        String url = new String("https://test.com");
+        assertTrue(podService.isValidURL(url));
+    }
+
+    @Test
+    void isValidURL_WithoutHttpUrl_shouldReturnFalse() {
+        String url = new String("www.hello.com");
+        assertFalse(podService.isValidURL(url));
+    }
 }
