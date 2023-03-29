@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api")
@@ -21,9 +20,9 @@ public class PodController {
     }
 
     @PostMapping("/podcasts")
-    public Mono<AssemblyAIApiResponse> sendUrl(@RequestBody(required = false) String url) {
-        podService.sendUrl(url);
-        return assemblyAIApiService.transcribeAudio(url);
+    public AssemblyAIApiResponse sendUrl(@RequestBody(required = false) String url) {
+        var body = podService.sendUrl(url);
+        return assemblyAIApiService.transcribeAudio(body);
 
     }
 }
