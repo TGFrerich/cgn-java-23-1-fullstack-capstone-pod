@@ -1,5 +1,10 @@
 package com.github.tgfrerich.backend.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
 public class AssemblyAIApiResponse {
 
     String id;
