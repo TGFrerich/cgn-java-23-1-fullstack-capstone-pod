@@ -7,8 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @AllArgsConstructor
 @Document("podcasts")
-public class Podcast {
-    private String internalId;
+public class TranscribedPodcastFromAssemblyAI {
     private String id;
     private String acousticModel;
     private double audioDuration;
