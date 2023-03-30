@@ -9,8 +9,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 public class AssemblyAIApiService {
 
-    private static final String ASSEMBLY_AI_API_ENDPOINT = "https://api.assemblyai.com/v2";
-    private static final String AUTH_TOKEN_ASSEMBLYAI = System.getenv("API_KEY_ASSEMBLYAI");
+    public static String ASSEMBLY_AI_API_ENDPOINT = "https://api.assemblyai.com/v2";
+    public static final String AUTH_TOKEN_ASSEMBLYAI = System.getenv("API_KEY_ASSEMBLYAI");
 
     private WebClient webClient = WebClient.create(ASSEMBLY_AI_API_ENDPOINT);
 
