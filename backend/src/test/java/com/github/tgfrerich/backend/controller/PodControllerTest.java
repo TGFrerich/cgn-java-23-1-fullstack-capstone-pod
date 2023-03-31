@@ -2,6 +2,7 @@ package com.github.tgfrerich.backend.controller;
 
 import com.github.tgfrerich.backend.model.AssemblyAIApiResponse;
 import com.github.tgfrerich.backend.model.RequestBodyForAssemblyAI;
+import com.github.tgfrerich.backend.repository.PodRepository;
 import com.github.tgfrerich.backend.service.AssemblyAIApiService;
 import com.github.tgfrerich.backend.service.PodService;
 import okhttp3.mockwebserver.MockResponse;
@@ -32,6 +33,8 @@ public class PodControllerTest {
 
     @MockBean
     private AssemblyAIApiService assemblyAIApiService;
+    @MockBean
+    private PodRepository podRepository;
 
     private MockWebServer mockWebServer;
 
@@ -60,9 +63,11 @@ public class PodControllerTest {
         );
 
         // Set up behavior for the mock beans
-        RequestBodyForAssemblyAI requestBodyForAssemblyAI = new RequestBodyForAssemblyAI(testUrl);
+        RequestBodyForAssemblyAI requestBodyForAssemblyAI = new RequestBodyForAssemblyAI();
+        requestBodyForAssemblyAI.setAudio_url(testUrl);
         when(podService.sendUrl(testUrl)).thenReturn(requestBodyForAssemblyAI);
-        when(assemblyAIApiService.transcribeAudio(requestBodyForAssemblyAI)).thenReturn(assemblyAIApiResponse);
+        when(podService.UrlExistsInDatabase(podRepository, requestBodyForAssemblyAI)).thenReturn(false);
+        when(assemblyAIApiService.sendTranscriptionRequestToAssemblyAI(requestBodyForAssemblyAI)).thenReturn(assemblyAIApiResponse);
 
         // Call the sendUrl endpoint
         AssemblyAIApiResponse response = webTestClient.post()
