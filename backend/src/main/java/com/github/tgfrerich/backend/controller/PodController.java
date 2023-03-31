@@ -27,7 +27,6 @@ public class PodController {
     public AssemblyAIApiResponse sendUrlToBackend_thenCheckIfUrlExists_returnCorrespondingResult(@RequestBody(required = false) String url) {
         var requestBodyForAssemblyAI = podService.sendUrl(url);
         boolean urlAlreadyExistsInDatabase = podService.UrlExistsInDatabase(podRepository, requestBodyForAssemblyAI);
-        System.out.println(urlAlreadyExistsInDatabase);
         var response = (urlAlreadyExistsInDatabase == false) ? assemblyAIApiService.sendTranscriptionRequestToAssemblyAI(requestBodyForAssemblyAI) : podRepository.findByAudioUrl(requestBodyForAssemblyAI.getAudio_url());
         return (AssemblyAIApiResponse) response;
     }
