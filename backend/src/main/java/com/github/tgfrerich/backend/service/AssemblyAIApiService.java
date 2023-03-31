@@ -15,7 +15,7 @@ public class AssemblyAIApiService {
     private WebClient webClient = WebClient.create(ASSEMBLY_AI_API_ENDPOINT);
 
 
-    public AssemblyAIApiResponse transcribeAudio(RequestBodyForAssemblyAI audioUrl) {
+    public AssemblyAIApiResponse sendTranscriptionRequestToAssemblyAI(RequestBodyForAssemblyAI audioUrl) {
         return webClient.post()
                 .uri("/transcript")
                 .header("Authorization", AUTH_TOKEN_ASSEMBLYAI)
