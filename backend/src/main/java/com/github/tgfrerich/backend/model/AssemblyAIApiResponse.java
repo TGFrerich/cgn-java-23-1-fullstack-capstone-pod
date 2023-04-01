@@ -19,4 +19,8 @@ public class AssemblyAIApiResponse {
     String punctuate;
     String text;
 
+    String speaker_labels;
+    String auto_chapters;
+
+
 }
