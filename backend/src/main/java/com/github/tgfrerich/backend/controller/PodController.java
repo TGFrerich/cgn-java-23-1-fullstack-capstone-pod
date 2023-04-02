@@ -1,21 +1,34 @@
 package com.github.tgfrerich.backend.controller;
 
 import com.github.tgfrerich.backend.model.AssemblyAIApiResponse;
+import com.github.tgfrerich.backend.model.AssemblyAIWebhook;
+import com.github.tgfrerich.backend.model.TranscribedPodcastFromAssemblyAI;
 import com.github.tgfrerich.backend.repository.PodRepository;
 import com.github.tgfrerich.backend.service.AssemblyAIApiService;
 import com.github.tgfrerich.backend.service.PodService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/api")
 public class PodController {
     private final PodService podService;
     private final AssemblyAIApiService assemblyAIApiService;
-
     private final PodRepository podRepository;
+
+    // Store SseEmitters using the id from AssemblyAI as the key
+    private final Map<String, SseEmitter> sseEmitterMap = new ConcurrentHashMap<>();
 
     public PodController(PodService podService, AssemblyAIApiService assemblyAIApiService, PodRepository podRepository) {
         this.podService = podService;
@@ -24,10 +37,57 @@ public class PodController {
     }
 
     @PostMapping("/podcasts")
-    public AssemblyAIApiResponse sendUrlToBackend_thenCheckIfUrlExists_returnCorrespondingResult(@RequestBody(required = false) String url) {
+    public SseEmitter sendUrl(@RequestBody(required = false) String url) {
         var requestBodyForAssemblyAI = podService.sendUrl(url);
         boolean urlAlreadyExistsInDatabase = podService.UrlExistsInDatabase(podRepository, requestBodyForAssemblyAI);
-        var response = (urlAlreadyExistsInDatabase == false) ? assemblyAIApiService.sendTranscriptionRequestToAssemblyAI(requestBodyForAssemblyAI) : podRepository.findByAudioUrl(requestBodyForAssemblyAI.getAudio_url());
-        return (AssemblyAIApiResponse) response;
+
+        SseEmitter emitter = new SseEmitter();
+
+        if (urlAlreadyExistsInDatabase) {
+            Optional<TranscribedPodcastFromAssemblyAI> response = podRepository.findByAudioUrl(requestBodyForAssemblyAI.getAudio_url());
+            try {
+                // Send the response directly to the client as the transcription is already available in the database
+                emitter.send(response);
+                emitter.complete();
+            } catch (IOException e) {
+                emitter.completeWithError(e);
+            }
+        } else {
+            // Send the transcription request to AssemblyAI and get the response
+            AssemblyAIApiResponse assemblyAIApiResponse = assemblyAIApiService.sendTranscriptionRequestToAssemblyAI(requestBodyForAssemblyAI);
+
+            // Store the SseEmitter in the map with the id as the key
+            sseEmitterMap.put(assemblyAIApiResponse.getId(), emitter);
+        }
+
+        return emitter;
     }
+
+    @PostMapping("/webhook")
+    public ResponseEntity<String> handleWebhook(@RequestBody AssemblyAIWebhook webhookData) {
+        if ("completed".equalsIgnoreCase(webhookData.getStatus())) {
+            TranscribedPodcastFromAssemblyAI transcribedAudio = assemblyAIApiService.fetchTranscriptionResult(webhookData.getId());
+            // Save the transcribed audio in the podRepository before sending it to the client
+            podRepository.save(transcribedAudio);
+
+            SseEmitter sseEmitter = sseEmitterMap.get(webhookData.getId());
+            if (sseEmitter != null) {
+                try {
+                    sseEmitter.send(transcribedAudio);
+                    sseEmitter.complete();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                sseEmitterMap.remove(webhookData.getId());
+            }
+            return ResponseEntity.ok("Webhook received and processed");
+        } else if ("error".equalsIgnoreCase(webhookData.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error in transcription");
+        } else {
+            return ResponseEntity.ok("Webhook received");
+        }
+    }
+
 }
+
+
