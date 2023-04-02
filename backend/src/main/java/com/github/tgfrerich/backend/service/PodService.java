@@ -34,7 +34,7 @@ public class PodService {
     }
 
     public boolean UrlExistsInDatabase(PodRepository podRepository, RequestBodyForAssemblyAI requestBody) {
-        if (podRepository.existsByAudioUrl(requestBody.getAudio_url())) {
+        if (podRepository.existsByAudio_Url(requestBody.getAudio_url())) {
             return true;
         } else {
             return false;
