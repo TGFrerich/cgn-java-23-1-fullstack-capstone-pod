@@ -1,12 +1,14 @@
 package com.github.tgfrerich.backend.service;
 
 import com.github.tgfrerich.backend.model.RequestBodyForAssemblyAI;
+import com.github.tgfrerich.backend.model.TranscribedPodcastFromAssemblyAI;
 import com.github.tgfrerich.backend.repository.PodRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URL;
+import java.util.Optional;
 
 @Service
 public class PodService {
@@ -33,12 +35,9 @@ public class PodService {
         }
     }
 
-    public boolean UrlExistsInDatabase(PodRepository podRepository, RequestBodyForAssemblyAI requestBody) {
-        if (podRepository.existsByAudio_Url(requestBody.getAudio_url())) {
-            return true;
-        } else {
-            return false;
-        }
-
+    public boolean UrlExistsInDatabase(PodRepository podRepository, RequestBodyForAssemblyAI requestBodyForAssemblyAI) {
+        Optional<TranscribedPodcastFromAssemblyAI> storedTranscription = podRepository.findByAudioUrl(requestBodyForAssemblyAI.getAudio_url());
+        return storedTranscription.isPresent();
     }
+
 }
