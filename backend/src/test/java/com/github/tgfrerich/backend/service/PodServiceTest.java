@@ -32,7 +32,7 @@ class PodServiceTest {
     @Test
     void sendUrl_withValidUrl_shouldReturn_RequestBodyForAssemblyAI_withValidUrl() {
         String url = "http://test.url";
-        RequestBodyForAssemblyAI result = podService.sendUrl(url);
+        RequestBodyForAssemblyAI result = podService.verifyUrlAndMakeToRequestBody(url);
 
         assertEquals(url, result.getAudio_url());
     }
@@ -40,7 +40,7 @@ class PodServiceTest {
     @Test
     void sendUrl_withEmptyUrl_shouldThrowException() {
         String url = "";
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> podService.sendUrl(url));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> podService.verifyUrlAndMakeToRequestBody(url));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         assertNull(exception.getReason());
     }

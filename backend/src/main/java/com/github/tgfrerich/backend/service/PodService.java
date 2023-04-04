@@ -14,7 +14,8 @@ import java.util.Optional;
 public class PodService {
 
 
-    public RequestBodyForAssemblyAI sendUrl(String url) {
+    public RequestBodyForAssemblyAI verifyUrlAndMakeToRequestBody(String url) {
+        url = url.strip();
         if (isValidURL(url)) {
             RequestBodyForAssemblyAI requestBodyForAssemblyAI = new RequestBodyForAssemblyAI();
             requestBodyForAssemblyAI.setAudio_url(url);
