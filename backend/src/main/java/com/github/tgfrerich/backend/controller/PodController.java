@@ -2,8 +2,11 @@ package com.github.tgfrerich.backend.controller;
 
 import com.github.tgfrerich.backend.model.AssemblyAIApiResponse;
 import com.github.tgfrerich.backend.model.AssemblyAIWebhook;
+import com.github.tgfrerich.backend.model.RequestFromFrontendDTO;
 import com.github.tgfrerich.backend.model.TranscribedPodcastFromAssemblyAI;
+import com.github.tgfrerich.backend.repository.AssemblyResponseRepository;
 import com.github.tgfrerich.backend.repository.PodRepository;
+import com.github.tgfrerich.backend.repository.WebhookRepository;
 import com.github.tgfrerich.backend.service.AssemblyAIApiService;
 import com.github.tgfrerich.backend.service.PodService;
 import org.springframework.http.HttpStatus;
@@ -26,22 +29,30 @@ public class PodController {
     private final PodService podService;
     private final AssemblyAIApiService assemblyAIApiService;
     private final PodRepository podRepository;
+    private final AssemblyResponseRepository assemblyResponseRepository;
+    private final WebhookRepository webhookRepository;
 
     // Store SseEmitters using the id from AssemblyAI as the key
     private final Map<String, SseEmitter> sseEmitterMap = new ConcurrentHashMap<>();
 
-    public PodController(PodService podService, AssemblyAIApiService assemblyAIApiService, PodRepository podRepository) {
+    public PodController(PodService podService, AssemblyAIApiService assemblyAIApiService, PodRepository podRepository, AssemblyResponseRepository assemblyResponseRepository, WebhookRepository webhookRepository) {
         this.podService = podService;
         this.assemblyAIApiService = assemblyAIApiService;
         this.podRepository = podRepository;
+        this.assemblyResponseRepository = assemblyResponseRepository;
+        this.webhookRepository = webhookRepository;
     }
 
     @PostMapping("/podcasts")
-    public SseEmitter sendUrl(@RequestBody(required = false) String url) {
-        var requestBodyForAssemblyAI = podService.sendUrl(url);
+    public SseEmitter sendUrl(@RequestBody RequestFromFrontendDTO requestFromFrontendDTO) {
+
+        String url = requestFromFrontendDTO.getAudio_url();
+
+        var requestBodyForAssemblyAI = podService.verifyUrlAndMakeToRequestBody(url);
         boolean urlAlreadyExistsInDatabase = podService.UrlExistsInDatabase(podRepository, requestBodyForAssemblyAI);
 
-        SseEmitter emitter = new SseEmitter();
+        SseEmitter emitter = new SseEmitter(86400000L);
+
 
         if (urlAlreadyExistsInDatabase) {
             Optional<TranscribedPodcastFromAssemblyAI> response = podRepository.findByAudioUrl(requestBodyForAssemblyAI.getAudio_url());
@@ -54,7 +65,10 @@ public class PodController {
             }
         } else {
             // Send the transcription request to AssemblyAI and get the response
+            System.exit(0);
             AssemblyAIApiResponse assemblyAIApiResponse = assemblyAIApiService.sendTranscriptionRequestToAssemblyAI(requestBodyForAssemblyAI);
+            assemblyResponseRepository.save(assemblyAIApiResponse);
+            System.out.println(assemblyAIApiResponse);
 
             // Store the SseEmitter in the map with the id as the key
             sseEmitterMap.put(assemblyAIApiResponse.getId(), emitter);
@@ -65,6 +79,7 @@ public class PodController {
 
     @PostMapping("/webhook")
     public ResponseEntity<String> handleWebhook(@RequestBody AssemblyAIWebhook webhookData) {
+        webhookRepository.save(webhookData);
         if ("completed".equalsIgnoreCase(webhookData.getStatus())) {
             TranscribedPodcastFromAssemblyAI transcribedAudio = assemblyAIApiService.fetchTranscriptionResult(webhookData.getId());
             // Save the transcribed audio in the podRepository before sending it to the client

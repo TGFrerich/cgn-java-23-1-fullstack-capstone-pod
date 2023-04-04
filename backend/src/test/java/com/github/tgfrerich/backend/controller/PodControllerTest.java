@@ -65,7 +65,7 @@ public class PodControllerTest {
         // Set up behavior for the mock beans
         RequestBodyForAssemblyAI requestBodyForAssemblyAI = new RequestBodyForAssemblyAI();
         requestBodyForAssemblyAI.setAudio_url(testUrl);
-        when(podService.sendUrl(testUrl)).thenReturn(requestBodyForAssemblyAI);
+        when(podService.verifyUrlAndMakeToRequestBody(testUrl)).thenReturn(requestBodyForAssemblyAI);
         when(podService.UrlExistsInDatabase(podRepository, requestBodyForAssemblyAI)).thenReturn(false);
         when(assemblyAIApiService.sendTranscriptionRequestToAssemblyAI(requestBodyForAssemblyAI)).thenReturn(assemblyAIApiResponse);
 
