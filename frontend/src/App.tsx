@@ -12,16 +12,9 @@ function App() {
           <p>
               In the future you will be able to read your favourite Podcasts here!
           </p>
-          <a
-              className="App-link"
-              href="https://reactjs.org"
-              target="_blank"
-              rel="noopener noreferrer"
-          >
-              Search for Podcasts
-          </a>
+          <PodcastForm/>
       </header>
-        <PodcastForm/>
+
     </div>
   );
 }
