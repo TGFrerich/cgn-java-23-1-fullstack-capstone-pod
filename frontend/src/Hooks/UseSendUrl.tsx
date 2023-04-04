@@ -11,10 +11,10 @@ export default function UseSendUrl() {
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setLoading(true);
-        await axios.post('/api/podcasts', podcast, {
-            headers: {
-                'Content-Type': 'text/plain',
-            },
+        await axios.post('/api/podcasts', {
+            audio_url: podcast,
+            language_code: "",
+
         })
             .then((result) => {
                 setPodcast('');
