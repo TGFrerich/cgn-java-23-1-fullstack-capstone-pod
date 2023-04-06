@@ -46,6 +46,7 @@ public class PodController {
     @PostMapping("/podcasts")
     public SseEmitter sendUrl(@RequestBody RequestFromFrontendDTO requestFromFrontendDTO) {
 
+
         String url = requestFromFrontendDTO.getAudio_url();
 
         var requestBodyForAssemblyAI = podService.verifyUrlAndMakeToRequestBody(url);

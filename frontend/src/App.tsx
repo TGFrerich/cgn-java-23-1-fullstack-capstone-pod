@@ -1,22 +1,26 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import PodcastForm from "./Component/PodcastForm";
+import {Route, Routes} from "react-router-dom";
+import Header from "./Component/Header";
+import ShowPodcasts from "./Component/ShowPodcasts";
+
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-          <h1>Podcai</h1>
-          <img src={logo} className="App-logo" alt="logo"/>
-          <p>
-              In the future you will be able to read your favourite Podcasts here!
-          </p>
-          <PodcastForm/>
-      </header>
+    return (
+        <div className="App">
 
-    </div>
-  );
+            <header className="App-header">
+                <Header/>
+                <Routes>
+                    <Route path={"/"} element={<PodcastForm/>}/>
+                    <Route path={"/podcast"} element={<ShowPodcasts/>}/>
+                </Routes>
+
+            </header>
+
+        </div>
+    );
 }
 
 export default App;

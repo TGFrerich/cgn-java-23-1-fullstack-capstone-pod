@@ -1,32 +1,31 @@
-import {FormEvent, useState} from "react";
+import {useCallback, useState} from "react";
 import {TranscribedPodcastFromAssemblyAI} from "../Model/TransribedPodcastFromAssemblyAI";
 import axios from "axios";
 
 export default function UseSendUrl() {
-
-    const [podcast, setPodcast] = useState('');
+    const [podcast, setPodcast] = useState("");
     const [loading, setLoading] = useState(false);
-    const [response, setResponse] = useState<TranscribedPodcastFromAssemblyAI | null>(null);
+    const [response, setResponse] = useState<TranscribedPodcastFromAssemblyAI | null>(
+        null
+    );
 
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+    const sendUrl = useCallback(async (url: string) => {
         setLoading(true);
-        await axios.post('/api/podcasts', {
-            audio_url: podcast,
-            language_code: "",
-
-        })
-            .then((result) => {
-                setPodcast('');
-                setResponse(result.data);
-            })
-            .catch((error) => {
-                console.log(error.response.data.error);
-            })
-            .finally(() => {
-                setLoading(false);
+        try {
+            console.log("AXIOS")
+            console.log(url)
+            const result = await axios.post("/api/podcasts", {
+                audio_url: url,
+                language_code: "",
             });
-    };
-    return {handleSubmit, podcast, setPodcast, loading, setLoading, response}
+            setPodcast("");
+            setResponse(result.data);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
+    return {sendUrl, podcast, setPodcast, loading, setLoading, response};
 }

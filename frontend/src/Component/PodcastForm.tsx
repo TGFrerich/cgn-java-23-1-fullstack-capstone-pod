@@ -1,14 +1,22 @@
 import React, {ChangeEvent} from 'react';
 import UseSendUrl from "../Hooks/UseSendUrl";
+import {useNavigate} from "react-router-dom";
 
 
 function PodcastForm() {
-    const {handleSubmit, podcast, setPodcast, loading, setLoading, response} = UseSendUrl();
+
+    const {podcast, setPodcast} = UseSendUrl();
+    const navigate = useNavigate();
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         console.log(event.target.value)
         setPodcast(event.target.value);
     };
+
+    function handleSubmit() {
+
+        navigate("/podcast")
+    }
 
     return (
         <div>
