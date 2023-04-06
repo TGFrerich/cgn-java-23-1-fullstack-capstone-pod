@@ -9,8 +9,7 @@ function PodcastForm() {
     const navigate = useNavigate();
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        console.log(event.target.value)
-        setPodcast(event.target.value);
+        setPodcast(event.target.value)
     };
 
     function handleSubmit() {
@@ -27,12 +26,6 @@ function PodcastForm() {
                 </label>
                 <button type="submit">Submit</button>
             </form>
-            {loading && <p>Loading...</p>}
-            {response && (
-                <pre>
-                    {JSON.stringify(response, null, 2)}
-                </pre>
-            )}
         </div>
     );
 }
