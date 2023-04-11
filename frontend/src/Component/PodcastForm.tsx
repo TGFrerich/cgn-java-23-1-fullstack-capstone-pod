@@ -23,7 +23,7 @@ function PodcastForm() {
     }
 
     if (response) {
-        return <PodcastData data={response}/>;
+        return <PodcastData response={response}/>;
     }
 
     return <UrlInput value={podcast} onChange={handleChange} onSubmit={handleSubmit}/>;
