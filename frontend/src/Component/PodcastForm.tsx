@@ -1,32 +1,32 @@
-import React, {ChangeEvent} from 'react';
+import React, {ChangeEvent, useEffect} from 'react';
 import UseSendUrl from "../Hooks/UseSendUrl";
-
+import LoadingScreen from "./LoadingScreen";
+import PodcastData from "./PodcastData";
+import UrlInput from "./UrlInput";
 
 function PodcastForm() {
     const {handleSubmit, podcast, setPodcast, loading, setLoading, response} = UseSendUrl();
 
+    useEffect(() => {
+        if (response) {
+            setLoading(false);
+        }
+    }, [response, setLoading]);
+
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        console.log(event.target.value)
+        console.log(event.target.value);
         setPodcast(event.target.value);
     };
 
-    return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Podcast:
-                    <input type="text" value={podcast} onChange={handleChange}/>
-                </label>
-                <button type="submit">Submit</button>
-            </form>
-            {loading && <p>Loading...</p>}
-            {response && (
-                <pre>
-                    {JSON.stringify(response, null, 2)}
-                </pre>
-            )}
-        </div>
-    );
+    if (loading) {
+        return <LoadingScreen/>;
+    }
+
+    if (response) {
+        return <PodcastData data={response}/>;
+    }
+
+    return <UrlInput value={podcast} onChange={handleChange} onSubmit={handleSubmit}/>;
 }
 
 export default PodcastForm;
