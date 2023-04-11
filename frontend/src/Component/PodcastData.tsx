@@ -1,16 +1,22 @@
 import React from 'react';
-import {TranscribedPodcastFromAssemblyAI} from '../Model/TransribedPodcastFromAssemblyAI';
 import PodcastCard from "../Model/PodcastCard";
+import {TranscribedPodcastFromAssemblyAI} from '../Model/TransribedPodcastFromAssemblyAI';
 
 type PodcastDataProps = {
-    data: TranscribedPodcastFromAssemblyAI;
+    response: TranscribedPodcastFromAssemblyAI | null;
 };
 
-function PodcastData({data}: PodcastDataProps) {
+function PodcastData({response}: PodcastDataProps) {
+    console.log("Response object:", response); // Add this line to log the response object
+
+    if (!response) {
+        return null;
+    }
+
     return (
         <div>
             <h2>Podcast Data</h2>
-            <PodcastCard podcastData={data}/>
+            <PodcastCard podcastData={response}/>
         </div>
     );
 }
