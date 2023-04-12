@@ -26,7 +26,7 @@ class PodServiceTest {
         idService = mock(IdService.class);
         podService = new PodService();
         when(idService.generateId()).thenReturn("Some Id");
-        transcribedPodcastFromAssemblyAI1 = new TranscribedPodcastFromAssemblyAI(idService.generateId(), "12", 1234, "url.hendrik", "en_us", 0.97, true, "assembly", true, "completed", "This is the podcast that you are listening to");
+        transcribedPodcastFromAssemblyAI1 = new TranscribedPodcastFromAssemblyAI(idService.generateId(), "https://someurl.com/podcast.mp3", "completed", 3528, "assemblyai_default", "assemblyai_default", "en_us", true, true, null, true, null);
     }
 
     @Test
@@ -48,13 +48,13 @@ class PodServiceTest {
 
     @Test
     void isValidURL_WithHttpUrl_shouldReturnTrue() {
-        String url = new String("https://test.com");
+        String url = "https://test.com";
         assertTrue(podService.isValidURL(url));
     }
 
     @Test
     void isValidURL_WithoutHttpUrl_shouldReturnFalse() {
-        String url = new String("www.hello.com");
+        String url = "www.hello.com";
         assertFalse(podService.isValidURL(url));
     }
 }
