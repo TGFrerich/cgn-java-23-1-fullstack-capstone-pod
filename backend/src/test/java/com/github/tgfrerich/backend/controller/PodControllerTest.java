@@ -2,7 +2,10 @@ package com.github.tgfrerich.backend.controller;
 
 import com.github.tgfrerich.backend.model.AssemblyAIApiResponse;
 import com.github.tgfrerich.backend.model.RequestBodyForAssemblyAI;
+import com.github.tgfrerich.backend.model.TranscribedPodcastFromAssemblyAI;
+import com.github.tgfrerich.backend.repository.AssemblyResponseRepository;
 import com.github.tgfrerich.backend.repository.PodRepository;
+import com.github.tgfrerich.backend.repository.WebhookRepository;
 import com.github.tgfrerich.backend.service.AssemblyAIApiService;
 import com.github.tgfrerich.backend.service.PodService;
 import okhttp3.mockwebserver.MockResponse;
@@ -18,6 +21,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
