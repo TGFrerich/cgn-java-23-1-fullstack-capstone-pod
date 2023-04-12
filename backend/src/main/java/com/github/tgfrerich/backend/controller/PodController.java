@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 @RestController
 @RequestMapping("/api")
 public class PodController {
@@ -85,9 +86,9 @@ public class PodController {
                 try {
                     sseEmitter.send(transcribedAudio);
                     sseEmitter.complete();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
                 }
+
                 sseEmitterMap.remove(webhookData.getId());
             }
             return ResponseEntity.ok("Webhook received and processed");
