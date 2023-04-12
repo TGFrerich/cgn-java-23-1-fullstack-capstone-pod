@@ -16,11 +16,11 @@ public class AssemblyAIApiResponse {
     String audio_url;
     Boolean format_text;
     String language_model;
-    String punctuate;
+    Boolean punctuate;
     String text;
 
-    String speaker_labels;
-    String auto_chapters;
+    Boolean speaker_labels;
+    Boolean auto_chapters;
 
 
 }
