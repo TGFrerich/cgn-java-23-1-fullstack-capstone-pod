@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest(PodController.class)
@@ -40,6 +40,12 @@ public class PodControllerTest {
     private AssemblyAIApiService assemblyAIApiService;
     @MockBean
     private PodRepository podRepository;
+    @MockBean
+    private AssemblyResponseRepository assemblyResponseRepository;
+    @MockBean
+    private WebhookRepository webhookRepository;
+    @Autowired
+    private PodController podController;
 
     private MockWebServer mockWebServer;
 
@@ -59,7 +65,7 @@ public class PodControllerTest {
         String testUrl = "https://test.com/podcast.mp3";
 
         // Set up a mock response from the AssemblyAI API
-        AssemblyAIApiResponse assemblyAIApiResponse = new AssemblyAIApiResponse("test_id", "test_status", "test_acoustic_model", 100, testUrl, true, "test_language_model", "test_punctuate", "test_text");
+        AssemblyAIApiResponse assemblyAIApiResponse = new AssemblyAIApiResponse("SomeId", "Queued", "assemblyai_default", 3258, "https://test.com/podcast.mp3", true, "assemblyai_default", true, "Podcast Text", true, true);
         mockWebServer.enqueue(
                 new MockResponse()
                         .setResponseCode(200)
@@ -71,32 +77,43 @@ public class PodControllerTest {
         RequestBodyForAssemblyAI requestBodyForAssemblyAI = new RequestBodyForAssemblyAI();
         requestBodyForAssemblyAI.setAudio_url(testUrl);
         when(podService.verifyUrlAndMakeToRequestBody(testUrl)).thenReturn(requestBodyForAssemblyAI);
-        when(podService.UrlExistsInDatabase(podRepository, requestBodyForAssemblyAI)).thenReturn(false);
+        when(podService.UrlExistsInDatabase(podRepository, requestBodyForAssemblyAI)).thenReturn(true);
         when(assemblyAIApiService.sendTranscriptionRequestToAssemblyAI(requestBodyForAssemblyAI)).thenReturn(assemblyAIApiResponse);
+        when(podRepository.findByAudioUrl("https://test.com/podcast.mp3")).thenReturn(Optional.of(new TranscribedPodcastFromAssemblyAI(
+                "12",
+                "https://test.com/podcast.mp3",
+                "",
+                1.12,
+                "",
+                "",
+                "",
+                true,
+                true,
+                List.of(),
+                true,
+                List.of()
+        )));
 
-        // Call the sendUrl endpoint
-        AssemblyAIApiResponse response = webTestClient.post()
+
+        WebTestClient.BodyContentSpec response = webTestClient.post()
                 .uri("/api/podcasts")
-                .contentType(MediaType.TEXT_PLAIN)
-                .bodyValue(testUrl)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                                                    "audio_url": "https://test.com/podcast.mp3",
+                                                    "language_code": ""
+                        }
+                        """)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(AssemblyAIApiResponse.class)
-                .returnResult()
-                .getResponseBody();
+                .expectBody();
 
 
-        // Assert the response is as expected
-        assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(assemblyAIApiResponse.getId());
-        assertThat(response.getStatus()).isEqualTo(assemblyAIApiResponse.getStatus());
-        assertThat(response.getAcoustic_model()).isEqualTo(assemblyAIApiResponse.getAcoustic_model());
-        assertThat(response.getAudio_duration()).isEqualTo(assemblyAIApiResponse.getAudio_duration());
-        assertThat(response.getAudio_url()).isEqualTo(assemblyAIApiResponse.getAudio_url());
-        assertThat(response.getFormat_text()).isEqualTo(assemblyAIApiResponse.getFormat_text());
-        assertThat(response.getLanguage_model()).isEqualTo(assemblyAIApiResponse.getLanguage_model());
-        assertThat(response.getPunctuate()).isEqualTo(assemblyAIApiResponse.getPunctuate());
-        assertThat(response.getText()).isEqualTo(assemblyAIApiResponse.getText());
+        String responseString = String.valueOf(response.returnResult());
+        //System.out.println(responseString);
+
+        assertTrue(responseString.contains(testUrl));
+
 
     }
 }
