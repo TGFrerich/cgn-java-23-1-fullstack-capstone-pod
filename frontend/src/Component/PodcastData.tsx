@@ -7,7 +7,6 @@ type PodcastDataProps = {
 };
 
 function PodcastData({response}: PodcastDataProps) {
-    console.log("Response object:", response); // Add this line to log the response object
 
     if (!response) {
         return null;
