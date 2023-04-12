@@ -2,6 +2,7 @@ import React, {ChangeEvent} from 'react';
 import UseSendUrl from '../Hooks/UseSendUrl';
 import UrlInput from './UrlInput';
 import PodcastData from './PodcastData';
+import LoadingScreen from "./LoadingScreen";
 
 function PodcastForm() {
     const {handleSubmit, podcast, setPodcast, response, loading} = UseSendUrl(); // Add loading here
@@ -11,7 +12,7 @@ function PodcastForm() {
     };
 
     if (loading) {
-        return <p>Loading...</p>;
+        return <LoadingScreen/>;
     }
 
     if (response) {
