@@ -57,20 +57,16 @@ public class PodController {
         if (urlAlreadyExistsInDatabase) {
             Optional<TranscribedPodcastFromAssemblyAI> response = podRepository.findByAudioUrl(requestBodyForAssemblyAI.getAudio_url());
             try {
-                // Send the response directly to the client as the transcription is already available in the database
+
                 emitter.send(response);
                 emitter.complete();
             } catch (IOException e) {
                 emitter.completeWithError(e);
             }
         } else {
-            // Send the transcription request to AssemblyAI and get the response
-            System.exit(0);
             AssemblyAIApiResponse assemblyAIApiResponse = assemblyAIApiService.sendTranscriptionRequestToAssemblyAI(requestBodyForAssemblyAI);
             assemblyResponseRepository.save(assemblyAIApiResponse);
-            System.out.println(assemblyAIApiResponse);
 
-            // Store the SseEmitter in the map with the id as the key
             sseEmitterMap.put(assemblyAIApiResponse.getId(), emitter);
         }
 
@@ -82,7 +78,6 @@ public class PodController {
         webhookRepository.save(webhookData);
         if ("completed".equalsIgnoreCase(webhookData.getStatus())) {
             TranscribedPodcastFromAssemblyAI transcribedAudio = assemblyAIApiService.fetchTranscriptionResult(webhookData.getId());
-            // Save the transcribed audio in the podRepository before sending it to the client
             podRepository.save(transcribedAudio);
 
             SseEmitter sseEmitter = sseEmitterMap.get(webhookData.getId());

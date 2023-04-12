@@ -6,11 +6,17 @@ type PodcastCardProps = {
 };
 
 function PodcastCard({podcastData}: PodcastCardProps) {
+    console.log('PodcastData object:', podcastData); // Keep this line to log the podcastData object
+
     const formatDuration = (duration: number) => {
         const hours = Math.floor(duration / 3600);
         const minutes = Math.floor((duration % 3600) / 60);
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
     };
+
+    // if (!podcastData) {
+    //     return <p>Loading podcast data...</p>;
+    // }
 
     return (
         <div className="podcast-card">
