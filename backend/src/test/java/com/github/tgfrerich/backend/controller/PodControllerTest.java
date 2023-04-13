@@ -68,7 +68,6 @@ public class PodControllerTest {
     public void sendUrl_validUrl_transcribesAudio() {
         String testUrl = "https://test.com/podcast.mp3";
 
-        // Set up a mock response from the AssemblyAI API
         AssemblyAIApiResponse assemblyAIApiResponse = new AssemblyAIApiResponse("SomeId", "Queued", "assemblyai_default", 3258, "https://test.com/podcast.mp3", true, "assemblyai_default", true, "Podcast Text", true, true);
         mockWebServer.enqueue(
                 new MockResponse()
@@ -77,7 +76,6 @@ public class PodControllerTest {
                         .setBody("{\"id\":\"test_id\",\"status\":\"test_status\",\"acoustic_model\":\"test_acoustic_model\",\"audio_duration\":100,\"audio_url\":\"" + testUrl + "\",\"format_text\":true,\"language_model\":\"test_language_model\",\"punctuate\":\"test_punctuate\",\"text\":\"test_text\"}")
         );
 
-        // Set up behavior for the mock beans
         RequestBodyForAssemblyAI requestBodyForAssemblyAI = new RequestBodyForAssemblyAI();
         requestBodyForAssemblyAI.setAudio_url(testUrl);
         when(podService.verifyUrlAndMakeToRequestBody(testUrl)).thenReturn(requestBodyForAssemblyAI);
@@ -114,7 +112,6 @@ public class PodControllerTest {
 
 
         String responseString = String.valueOf(response.returnResult());
-        //System.out.println(responseString);
 
         assertTrue(responseString.contains(testUrl));
 
@@ -123,19 +120,16 @@ public class PodControllerTest {
 
     @Test
     void handleWebhookTest() {
-        // Prepare the webhook data
         AssemblyAIWebhook webhookData = new AssemblyAIWebhook();
         webhookData.setId("mock-id");
         webhookData.setStatus("completed");
 
-        // Set up a mock response for the AssemblyAI API to fetch the transcription result
         String responseBody = "{\"id\": \"mock-id\", \"status\": \"completed\", \"text\": \"Sample transcript\"}";
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200)
                 .setHeader("Content-Type", "application/json")
                 .setBody(responseBody));
 
-        // Update the AssemblyAIApiService webClient to use the MockWebServer URL
         WebClient webClient = WebClient.builder()
                 .baseUrl(mockWebServer.url("/").toString())
                 .build();
