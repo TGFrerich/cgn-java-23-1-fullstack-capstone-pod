@@ -21,13 +21,13 @@ public class AssemblyAIApiService {
 
 
     public AssemblyAIApiResponse sendTranscriptionRequestToAssemblyAI(RequestBodyForAssemblyAI audioUrl) {
-        String webhookUrl = YOUR_BASE_URL + "/api/webhook"; // Replace {your_base_url} with your application's base URL
+        String webhookUrl = YOUR_BASE_URL + "/api/webhook";
 
         RequestBodyForAssemblyAI requestBody = new RequestBodyForAssemblyAI(
                 audioUrl.getAudio_url(),
                 webhookUrl,
-                true, // Enable auto_chapters
-                true  // Enable speaker_labels
+                true,
+                true
         );
 
         return webClient.post()
