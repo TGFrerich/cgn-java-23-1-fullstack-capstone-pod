@@ -13,7 +13,7 @@ public class AssemblyAIApiService {
 
     private static final String AUTH_TOKEN_ASSEMBLYAI = System.getenv("API_KEY_ASSEMBLYAI");
     private static final String YOUR_BASE_URL = System.getenv("YOUR_BASE_URL");
-    private WebClient webClient;
+    public WebClient webClient;
 
     public AssemblyAIApiService(WebClient webClient) {
         this.webClient = webClient;
