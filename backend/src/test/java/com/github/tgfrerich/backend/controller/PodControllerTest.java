@@ -1,6 +1,7 @@
 package com.github.tgfrerich.backend.controller;
 
 import com.github.tgfrerich.backend.model.AssemblyAIApiResponse;
+import com.github.tgfrerich.backend.model.AssemblyAIWebhook;
 import com.github.tgfrerich.backend.model.RequestBodyForAssemblyAI;
 import com.github.tgfrerich.backend.model.TranscribedPodcastFromAssemblyAI;
 import com.github.tgfrerich.backend.repository.AssemblyResponseRepository;
@@ -17,8 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 import java.util.List;
@@ -51,6 +54,7 @@ public class PodControllerTest {
 
     @BeforeEach
     public void setUp() throws IOException {
+
         mockWebServer = new MockWebServer();
         mockWebServer.start();
     }
@@ -116,4 +120,41 @@ public class PodControllerTest {
 
 
     }
+
+    @Test
+    void handleWebhookTest() {
+        // Prepare the webhook data
+        AssemblyAIWebhook webhookData = new AssemblyAIWebhook();
+        webhookData.setId("mock-id");
+        webhookData.setStatus("completed");
+
+        // Set up a mock response for the AssemblyAI API to fetch the transcription result
+        String responseBody = "{\"id\": \"mock-id\", \"status\": \"completed\", \"text\": \"Sample transcript\"}";
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setHeader("Content-Type", "application/json")
+                .setBody(responseBody));
+
+        // Update the AssemblyAIApiService webClient to use the MockWebServer URL
+        WebClient webClient = WebClient.builder()
+                .baseUrl(mockWebServer.url("/").toString())
+                .build();
+        assemblyAIApiService.webClient = webClient;
+
+
+        assemblyAIApiService.webClient = assemblyAIApiService.webClient.mutate()
+                .baseUrl(mockWebServer.url("/").toString())
+                .build();
+
+        // Send a request to the /api/webhook endpoint
+        webTestClient.post()
+                .uri("/api/webhook")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(webhookData)
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatus.OK)
+                .expectBody(String.class)
+                .isEqualTo("Webhook received and processed");
+    }
+
 }
