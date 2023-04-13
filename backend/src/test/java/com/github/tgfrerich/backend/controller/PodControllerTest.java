@@ -14,21 +14,29 @@ import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 
 @WebFluxTest(PodController.class)
 @AutoConfigureWebTestClient
@@ -151,4 +159,31 @@ public class PodControllerTest {
                 .isEqualTo("Webhook received and processed");
     }
 
+    @Test
+    void handleWebhook_validWebhookData_sendsSseData() throws Exception {
+        String testId = "test_id";
+        String testStatus = "completed";
+        AssemblyAIWebhook webhookData = new AssemblyAIWebhook();
+        webhookData.setId(testId);
+        webhookData.setStatus(testStatus);
+        SseEmitter mockSseEmitter = mock(SseEmitter.class);
+
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                assertTrue(args[0] instanceof TranscribedPodcastFromAssemblyAI);
+                return null;
+            }
+        }).when(mockSseEmitter).send(any());
+
+        podController.sseEmitterMap.put(testId, mockSseEmitter);
+
+        ResponseEntity<String> response = podController.handleWebhook(webhookData);
+
+
+        assertEquals("Webhook received and processed", response.getBody());
+
+        assertFalse(podController.sseEmitterMap.containsKey(testId));
+    }
 }
