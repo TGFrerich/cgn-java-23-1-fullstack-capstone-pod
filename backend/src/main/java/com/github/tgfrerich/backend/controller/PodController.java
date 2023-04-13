@@ -37,7 +37,7 @@ public class PodController {
 
     private static final Logger logger = LoggerFactory.getLogger(PodController.class);
 
-    private final Map<String, SseEmitter> sseEmitterMap = new ConcurrentHashMap<>();
+    final Map<String, SseEmitter> sseEmitterMap = new ConcurrentHashMap<>();
 
     public PodController(PodService podService, AssemblyAIApiService assemblyAIApiService, PodRepository podRepository, AssemblyResponseRepository assemblyResponseRepository, WebhookRepository webhookRepository) {
         this.podService = podService;
