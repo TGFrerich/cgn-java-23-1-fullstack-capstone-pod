@@ -17,7 +17,7 @@ public class WebClientConfiguration {
 
     @Bean
     public WebClient customWebClient() {
-        int maxBufferSizeInBytes = 10 * 1024 * 1024; // Increase buffer size to 10 MB
+        int maxBufferSizeInBytes = 10 * 1024 * 1024;
 
         HttpClient httpClient = HttpClient.create()
                 .responseTimeout(Duration.ofMinutes(1))
@@ -25,10 +25,9 @@ public class WebClientConfiguration {
                     try {
                         sslContextSpec.sslContext(SslContextBuilder.forClient().build());
                     } catch (SSLException e) {
-                        throw new RuntimeException("Error configuring SSL context", e);
+                        throw new IllegalStateException("Error configuring SSL context", e);
                     }
                 });
-
         ClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
 
         return WebClient.builder()
