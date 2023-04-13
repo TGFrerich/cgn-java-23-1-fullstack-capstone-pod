@@ -23,7 +23,7 @@ public class WebClientConfiguration {
                 .responseTimeout(Duration.ofMinutes(1))
                 .secure(sslContextSpec -> {
                     try {
-                        sslContextSpec.sslContext(SslContextBuilder.forClient().build());
+                        sslContextSpec.sslContext(sslContextBuilderForTesting().build());
                     } catch (SSLException e) {
                         throw new IllegalStateException("Error configuring SSL context", e);
                     }
@@ -37,5 +37,10 @@ public class WebClientConfiguration {
                 .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(maxBufferSizeInBytes))
                 .build();
     }
+
+    protected SslContextBuilder sslContextBuilderForTesting() throws SSLException {
+        return SslContextBuilder.forClient();
+    }
+
 }
 
