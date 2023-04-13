@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -56,5 +58,29 @@ class PodServiceTest {
     void isValidURL_WithoutHttpUrl_shouldReturnFalse() {
         String url = "www.hello.com";
         assertFalse(podService.isValidURL(url));
+    }
+
+    @Test
+    void urlExistsInDatabase_withExistingUrl_returnsTrue() {
+        String existingUrl = "https://someurl.com/podcast.mp3";
+        when(podRepository.findByAudioUrl(existingUrl)).thenReturn(Optional.of(transcribedPodcastFromAssemblyAI1));
+
+        RequestBodyForAssemblyAI requestBody = new RequestBodyForAssemblyAI();
+        requestBody.setAudio_url(existingUrl);
+        boolean result = podService.UrlExistsInDatabase(podRepository, requestBody);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void urlExistsInDatabase_withNonExistingUrl_returnsFalse() {
+        String nonExistingUrl = "https://nonexistingurl.com/podcast.mp3";
+        when(podRepository.findByAudioUrl(nonExistingUrl)).thenReturn(Optional.empty());
+
+        RequestBodyForAssemblyAI requestBody = new RequestBodyForAssemblyAI();
+        requestBody.setAudio_url(nonExistingUrl);
+        boolean result = podService.UrlExistsInDatabase(podRepository, requestBody);
+
+        assertFalse(result);
     }
 }
