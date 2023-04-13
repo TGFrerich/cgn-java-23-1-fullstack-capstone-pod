@@ -1,11 +1,14 @@
 package com.github.tgfrerich.backend.service;
 
-import com.github.tgfrerich.backend.model.Podcast;
+import com.github.tgfrerich.backend.model.RequestBodyForAssemblyAI;
+import com.github.tgfrerich.backend.model.TranscribedPodcastFromAssemblyAI;
 import com.github.tgfrerich.backend.repository.PodRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -16,7 +19,7 @@ class PodServiceTest {
     PodRepository podRepository;
     PodService podService;
     IdService idService;
-    Podcast podcast1;
+    TranscribedPodcastFromAssemblyAI transcribedPodcastFromAssemblyAI1;
 
 
     @BeforeEach
@@ -25,25 +28,59 @@ class PodServiceTest {
         idService = mock(IdService.class);
         podService = new PodService();
         when(idService.generateId()).thenReturn("Some Id");
-        podcast1 = new Podcast(idService.generateId(), "12", "assemblyai", 345, "url.hendrik", "en_us", 0.97, true, "assembly", true, "completed", "This is the podcast that you are listening to");
+        transcribedPodcastFromAssemblyAI1 = new TranscribedPodcastFromAssemblyAI(idService.generateId(), "https://someurl.com/podcast.mp3", "completed", 3528, "assemblyai_default", "assemblyai_default", "en_us", true, true, null, true, null);
     }
 
     @Test
-    void sendUrl_withValidUrl_shouldReturnSameUrl() {
-        String url = "test.url";
-        String result = podService.sendUrl(url);
+    void sendUrl_withValidUrl_shouldReturn_RequestBodyForAssemblyAI_withValidUrl() {
+        String url = "http://test.url";
+        RequestBodyForAssemblyAI result = podService.verifyUrlAndMakeToRequestBody(url);
 
-        // Assert
-        assertEquals(url, result);
+        assertEquals(url, result.getAudio_url());
     }
 
     @Test
     void sendUrl_withEmptyUrl_shouldThrowException() {
         String url = "";
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> podService.sendUrl(url));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> podService.verifyUrlAndMakeToRequestBody(url));
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         assertNull(exception.getReason());
     }
 
 
+    @Test
+    void isValidURL_WithHttpUrl_shouldReturnTrue() {
+        String url = "https://test.com";
+        assertTrue(podService.isValidURL(url));
+    }
+
+    @Test
+    void isValidURL_WithoutHttpUrl_shouldReturnFalse() {
+        String url = "www.hello.com";
+        assertFalse(podService.isValidURL(url));
+    }
+
+    @Test
+    void urlExistsInDatabase_withExistingUrl_returnsTrue() {
+        String existingUrl = "https://someurl.com/podcast.mp3";
+        when(podRepository.findByAudioUrl(existingUrl)).thenReturn(Optional.of(transcribedPodcastFromAssemblyAI1));
+
+        RequestBodyForAssemblyAI requestBody = new RequestBodyForAssemblyAI();
+        requestBody.setAudio_url(existingUrl);
+        boolean result = podService.UrlExistsInDatabase(podRepository, requestBody);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void urlExistsInDatabase_withNonExistingUrl_returnsFalse() {
+        String nonExistingUrl = "https://nonexistingurl.com/podcast.mp3";
+        when(podRepository.findByAudioUrl(nonExistingUrl)).thenReturn(Optional.empty());
+
+        RequestBodyForAssemblyAI requestBody = new RequestBodyForAssemblyAI();
+        requestBody.setAudio_url(nonExistingUrl);
+        boolean result = podService.UrlExistsInDatabase(podRepository, requestBody);
+
+        assertFalse(result);
+    }
 }
