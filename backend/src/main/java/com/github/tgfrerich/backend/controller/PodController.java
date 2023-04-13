@@ -9,6 +9,8 @@ import com.github.tgfrerich.backend.repository.PodRepository;
 import com.github.tgfrerich.backend.repository.WebhookRepository;
 import com.github.tgfrerich.backend.service.AssemblyAIApiService;
 import com.github.tgfrerich.backend.service.PodService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,7 +35,8 @@ public class PodController {
     private final AssemblyResponseRepository assemblyResponseRepository;
     private final WebhookRepository webhookRepository;
 
-    // Store SseEmitters using the id from AssemblyAI as the key
+    private static final Logger logger = LoggerFactory.getLogger(PodController.class);
+
     private final Map<String, SseEmitter> sseEmitterMap = new ConcurrentHashMap<>();
 
     public PodController(PodService podService, AssemblyAIApiService assemblyAIApiService, PodRepository podRepository, AssemblyResponseRepository assemblyResponseRepository, WebhookRepository webhookRepository) {
@@ -86,10 +89,11 @@ public class PodController {
                 try {
                     sseEmitter.send(transcribedAudio);
                     sseEmitter.complete();
-                } catch (Exception e) {
+                } catch (IOException e) {
+                    logger.error("Error sending SSE data", e);
                 }
-
                 sseEmitterMap.remove(webhookData.getId());
+
             }
             return ResponseEntity.ok("Webhook received and processed");
         } else if ("error".equalsIgnoreCase(webhookData.getStatus())) {
