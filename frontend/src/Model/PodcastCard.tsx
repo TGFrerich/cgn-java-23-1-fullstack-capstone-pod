@@ -1,5 +1,6 @@
 import React from 'react';
 import {TranscribedPodcastFromAssemblyAI} from '../Model/TransribedPodcastFromAssemblyAI';
+import "../Styling/PodCastCard.css"
 
 type PodcastCardProps = {
     podcastData: TranscribedPodcastFromAssemblyAI;
@@ -11,21 +12,20 @@ function PodcastCard({podcastData}: PodcastCardProps) {
     const formatDuration = (duration: number) => {
         const hours = Math.floor(duration / 3600);
         const minutes = Math.floor((duration % 3600) / 60);
-        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        return `${hours.toString().padStart(2, '0')}h${minutes.toString().padStart(2, '0')}m`;
     };
 
-    // if (!podcastData) {
-    //     return <p>Loading podcast data...</p>;
-    // }
+
 
     return (
         <div className="podcast-card">
             <h3>Audio Duration: {formatDuration(podcastData.audio_duration)}</h3>
-            <h4>Utterances</h4>
+            <h4>Conversation</h4>
             {podcastData.utterances && podcastData.utterances.map((utterance, index) => (
-                <div key={index} style={{marginBottom: '1rem'}}>
-                    <strong>Speaker {utterance.speaker}:</strong>
-                    <p>{utterance.text}</p>
+                <div key={index}>
+                    <div className="podcast-card-speaker"><strong>Speaker {utterance.speaker}:</strong></div>
+                    <div className="podcast-card-utterance"><p>{utterance.text}</p></div>
+
                 </div>
             ))}
         </div>
