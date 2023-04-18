@@ -1,0 +1,6 @@
+.podcast-card {
+    height: 100%;
+    text-align: left;
+    padding: 2%;
+    font-size: calc(10px + 2vmin);
+}

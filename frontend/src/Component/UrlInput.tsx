@@ -8,13 +8,13 @@ type UrlInputProps = {
 
 function UrlInput({value, onChange, onSubmit}: UrlInputProps) {
     return (
-        <div>
+        <div className="podcast-form">
             <form onSubmit={onSubmit}>
                 <label>
-                    Podcast:
-                    <input type="text" value={value} onChange={onChange}/>
+                    <input type="text" value={value} onChange={onChange}
+                           placeholder="Paste your url to your podcast audio file"/>
                 </label>
-                <button type="submit">Submit</button>
+                <button className="button-submit" type="submit">Submit</button>
             </form>
         </div>
     );

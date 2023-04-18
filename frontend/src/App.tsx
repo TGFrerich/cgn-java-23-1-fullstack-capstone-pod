@@ -12,8 +12,9 @@ function App() {
           <p>
               In the future you will be able to read your favourite Podcasts here!
           </p>
-          <PodcastForm/>
+
       </header>
+        <PodcastForm/>
 
     </div>
   );

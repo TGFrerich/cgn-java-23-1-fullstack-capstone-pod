@@ -14,7 +14,7 @@ function PodcastData({response}: PodcastDataProps) {
 
     return (
         <div>
-            <h2>Podcast Data</h2>
+            <h2>Podcast Transcription and Summary</h2>
             <PodcastCard podcastData={response}/>
         </div>
     );
