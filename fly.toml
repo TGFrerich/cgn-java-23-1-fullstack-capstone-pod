@@ -1,8 +1,9 @@
-# fly.toml file generated for capstone-project on 2023-03-15T12:38:35+01:00
+# fly.toml file generated for capstone-project on 2023-04-18T11:14:21+02:00
 
 app = "capstone-project"
 kill_signal = "SIGINT"
 kill_timeout = 5
+primary_region = "ams"
 processes = []
 
 [env]
@@ -11,11 +12,13 @@ processes = []
   auto_rollback = true
 
 [[services]]
-  http_checks = []
-  internal_port = 8080
-  processes = ["app"]
-  protocol = "tcp"
-  script_checks = []
+autostart = true
+autostop = false
+http_checks = []
+internal_port = 8080
+processes = ["app"]
+protocol = "tcp"
+script_checks = []
   [services.concurrency]
     hard_limit = 25
     soft_limit = 20
